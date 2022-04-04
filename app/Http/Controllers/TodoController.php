@@ -22,10 +22,9 @@ class TodoController extends Controller
        */
       public function index()
       {
-            $todos = Todo::where('user_id', Auth::user()->id)->get();
             return response()->json([
                   'status' => 'success',
-                  'data' => $todos
+                  'data' => Todo::where('user_id', Auth::user()->id)->get()
             ]);
       }
 
@@ -40,16 +39,15 @@ class TodoController extends Controller
                   'user_id' => 'required|integer|exists:users,id',
                   'content' => 'required|string|max:255',
             ]);
-
-            $data['completed'] = false;
-            $data['complete_date'] = null;
-
-            $todo = Todo::create($data);
-
+            $todo= Todo::create($data);
+            $todo ?
             return response()->json([
                   'status' => 'success',
-                  'todo' => $todo,
-            ]);
+                  'todo' => $todo
+            ]):return response()->json([
+                  'status' => 'error',
+                  'todo' => 'Todo not created'
+            ])
       }
 
       /**
@@ -60,10 +58,9 @@ class TodoController extends Controller
        */
       public function show($id)
       {
-            $todo = Todo::findOrFail($id);
             return response()->json([
                   'status' => 'success',
-                  'todo' => $todo,
+                  'todo' => Todo::findOrFail($id),
             ]);
       }
 
@@ -94,8 +91,7 @@ class TodoController extends Controller
        */
       public function destroy($id)
       {
-            $todo = Todo::findOrFail($id);
-            $todo->delete();
+            Todo::findOrFail($id)->delete();
 
             return response()->json([
                   'status' => 'success',
@@ -108,14 +104,9 @@ class TodoController extends Controller
        */
       public function markAsComplete($id)
       {
-            $todo = Todo::findOrFail($id);
-            $todo->completed = true;
-            $todo->complete_date = Carbon::now();
-            $todo->save();
-
             return response()->json([
                   'status' => 'success',
-                  'todo' => $todo,
+                  'todo' => Todo::findOrFail($id)->update(['completed'=>true,'complete_date'=>Carbon::now()]),
             ]);
       }
 
@@ -124,14 +115,9 @@ class TodoController extends Controller
        */
       public function markAsIncomplete($id)
       {
-            $todo = Todo::findOrFail($id);
-            $todo->completed = false;
-            $todo->complete_date = null;
-            $todo->save();
-
             return response()->json([
                   'status' => 'success',
-                  'todo' => $todo,
+                  'todo' => Todo::findOrFail($id)->update(['completed'=>false,'complete_date'=>null),
             ]);
       }
 

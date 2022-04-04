@@ -28,13 +28,16 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
     Route::get('profile', 'AuthController@profile');
 
     // Todo Routes
-    $router->post('todos/create', 'TodoController@store');
-    $router->get('todos/{id}', 'TodoController@show');
-    $router->get('todos', 'TodoController@index');
-    $router->put('todos/{id}', 'TodoController@update');
-    $router->delete('todos/{id}', 'TodoController@destroy');
-
-    // marsk as complete and incomplete todos routes
-    $router->put('todos/{id}/complete', 'TodoController@markAsComplete');
-    $router->put('todos/{id}/incomplete', 'TodoController@markAsIncomplete');
+    $router->group(['prefix' => 'todos'], function () use ($router) {
+        $router->post('create', 'TodoController@store');
+        $router->get('{id}', 'TodoController@show');
+        $router->get('', 'TodoController@index');
+        $router->put('{id}', 'TodoController@update');
+        $router->delete('{id}', 'TodoController@destroy');
+        // marsk as complete and incomplete todos routes
+        $router->put('{id}/complete', 'TodoController@markAsComplete');
+        $router->put('{id}/incomplete', 'TodoController@markAsIncomplete');
+    });
+    
+    
 });
